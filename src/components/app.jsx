@@ -1,46 +1,78 @@
+import {Component} from 'react'
 import Filter from './filter'
 import Information from './information'
 import ShoppingAddForm from './shopping-add-form'
 import ShoppingList from './shopping-list'
+import { arr } from '../constants'
+import {v4 as uuidv4} from 'uuid';
 
-function App() {
+class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      data: arr
+    }
+  }
 
-  const data = [
-    {
-      id: 1,
-      size: 14,
-      title: 'Buy bananas',
-      active: false
-    },
-    {
-      id: 2,
-      size: 10,
-      title: 'Buy apples',
-      active: true
-    },
-    {
-      id: 3,
-      size: 8,
-      title: 'Buy milk',
-      active: false
-    },
-  ]
-  return (
-    <div className='app'>
-      <div className="wrapper">
-        <div className="card">
-          <Information/>
+  onDelete = (id) => {
+    const newArr = this.state.data.filter(item => item.id !== id)
+    this.setState({
+      data: newArr
+    })
+  }
 
-          <ShoppingAddForm/>
+  onToggleActive = (id) => {
+    const newArr = this.state.data.map(item => {
+      if(item.id === id){
+        return {...item, active: !item.active}
+      }else{
+        return item
+      }
+    })
+  
+    this.setState({
+      data: newArr
+    })
+  }
 
-          <ShoppingList data={data} />
+  onAdd = (item) => {
+    const {title, number} = item
+    const newData = {title, size: number, active: false, id:uuidv4()}
+    const newArr = [...this.state.data, newData]
+    this.setState({
+      data: newArr
+    })
 
-          <Filter/>
+
+  }
+
+  render() {
+    const {data} = this.state
+    return (
+      <div className='app'>
+        <div className="wrapper">
+          <div className="card">
+
+            <Information length={data.length}/>
+  
+            <ShoppingAddForm 
+              onAdd={this.onAdd}
+            />
+  
+            <ShoppingList 
+              data={data}
+              onDelete={this.onDelete}
+              onToggleActive = {this.onToggleActive}
+            />
+  
+            <Filter/>
+
+          </div>
+          <img src="/public/earth.svg" alt="earthPhoto" />
         </div>
-        <img src="/public/earth.svg" alt="earthPhoto" />
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 export default App
